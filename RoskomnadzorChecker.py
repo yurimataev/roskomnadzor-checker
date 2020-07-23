@@ -26,8 +26,9 @@ class RoskomnadzorChecker(object):
 
         # Load the data
         response = urllib.request.urlopen(req)
+        raw_data = response.read()
         self._timeForOperation('Downloaded in')
-        data = json.loads(response.read())
+        data = json.loads(raw_data)
         self._timeForOperation('Parsed JSON in')
 
         # Check to make sure data is current
