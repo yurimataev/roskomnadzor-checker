@@ -14,7 +14,10 @@ class RoskomnadzorChecker(object):
     """
     FIELDS = ('ip', 'link', 'page', 'date', 'gos_organ', 'postanovlenie')
 
-    def __init__(self):
+    def __init__(self, verbose):
+        self.verbose = verbose
+        self.startTime = datetime.datetime.now()
+
         # We have to specify a browser-like user agent to prevent from being blocked
         req = urllib.request.Request(
           'https://reestr.rublacklist.net/api/v2/current/json',
@@ -23,18 +26,21 @@ class RoskomnadzorChecker(object):
 
         # Load the data
         response = urllib.request.urlopen(req)
+        self._timeForOperation('Downloaded in')
         data = json.loads(response.read())
+        self._timeForOperation('Parsed JSON in')
 
         # Check to make sure data is current
         currDate = str(datetime.date.today())
         if not currDate in data.keys():
-            raise JsonDataError('Feed is out-of-date ' + currDate + ' ' + str(data.keys()))
+            raise RoskomnadzorCheckerError('Feed is out-of-date ' + currDate + ' ' + str(data.keys()))
 
         self.data = data[currDate]
 
     def findMatches(self, field, pattern):
         # This method checks our data for entries where a specified field
         # includes a string (pattern). '*' means all fields.
+        self._checkValidField(field)
         matches = []
         for entry in self.data:
             if field == '*':
@@ -49,6 +55,7 @@ class RoskomnadzorChecker(object):
     def findMatchesRegex(self, field, pattern):
         # This method checks our data for entries where a specified field 
         # matches a regular expresion. '*' means all fields.
+        self._checkValidField(field)
         matches = []
         for entry in self.data:
             if field == '*':
@@ -60,9 +67,20 @@ class RoskomnadzorChecker(object):
 
         return matches
 
+    def _timeForOperation(self, message):
+        # Prints how long has passed since the last time this method was run
+        if self.verbose:
+            timeStr = str(datetime.datetime.now() - self.startTime)
+            print(message + ' ' + timeStr)
+            self.startTime = datetime.datetime.now()
 
-class JsonDataError(Exception):
-    """Exception raised for errors in the JSON feed.
+    def _checkValidField(self, field):
+        # Checks if a field is in our list of valid fields
+        if not field in self.FIELDS:
+            raise RoskomnadzorCheckerError(field + ' is not a valid field!')
+
+class RoskomnadzorCheckerError(Exception):
+    """Exception for this module.
 
     Attributes:
         message -- explanation of the error

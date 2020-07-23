@@ -1,7 +1,7 @@
 from RoskomnadzorChecker import RoskomnadzorChecker
 
 if __name__ == '__main__':
-    checker = RoskomnadzorChecker()
+    checker = RoskomnadzorChecker(True)
 
     print ("Search fields include " + ', '.join(checker.FIELDS) + ". Use * to search all fields.")
     while True:
