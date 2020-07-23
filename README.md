@@ -8,7 +8,7 @@ To use the CLI:
 
     python roskom-cli.py
 
-If you're using it your code, the RoskomnadzorChecker class has the following methods:
+If you're using it in your code, the RoskomnadzorChecker class has the following methods:
 
     checker = RoskomnadzorChecker()
     matches = checker.findMatches('fieldname', 'string')
