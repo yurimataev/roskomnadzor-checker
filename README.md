@@ -11,8 +11,12 @@ To use the CLI:
 If you're using it in your code, the RoskomnadzorChecker class has the following methods:
 
     checker = RoskomnadzorChecker()
-    matches = checker.findMatches('fieldname', 'string')
+    matches = checker.findMatches('field name', 'string')
     # or
-    matches = checker.findMatchesRegex('fieldname', r'regex pattern')
+    matches = checker.findMatchesRegex('field name', r'regex pattern')
+    # or 
+    matches = checker.findMatches('field name', r'regex pattern', 'regex')
 
 `matches` will be a list
+
+Valid field names include 'ip', 'link', 'page', 'date', 'gos_organ', 'postanovlenie' and '*' as a wildcard. They are stored in `RoskomnadzorChecker.FIELDS` if you need to access the values programmatically.
