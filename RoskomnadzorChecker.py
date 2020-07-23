@@ -54,19 +54,37 @@ class RoskomnadzorChecker(object):
         return matches
 
     def findMatchesRegex(self, field, pattern):
-        # This method checks our data for entries where a specified field 
-        # matches a regular expresion. '*' means all fields.
+        # Thin wrapper around self.findMatches
+        return self.findMatches(field, pattern, 'regex')
+
+    def findMatches(self, field, pattern, mode = ''):
+        # This method checks our data for entries where a specified field
+        # matches a pattern. '*' is wildcard. This support both regex and
+        # non-regex matching.
         self._checkValidField(field)
+
+        # Compiling the regex ahead of time is more efficient
+        if mode =='regex':
+            pattern = re.compile(pattern)
+
+        # Loop through data
         matches = []
         for entry in self.data:
             if field == '*':
-                if re.match(pattern, str(entry)):
+                if self._match(str(entry), pattern):
                     matches.append(entry)
             else:
-                if re.match(pattern, str(entry[field])):
+                if self._match(str(entry[field]), pattern):
                     matches.append(entry)
 
         return matches
+
+    def _match(field, pattern, mode) {
+        if mode == 'regex':
+            return pattern.match(field)
+        else:
+            return pattern in field
+    }
 
     def _timeForOperation(self, message):
         # Prints how long has passed since the last time this method was run
